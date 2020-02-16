@@ -24,10 +24,10 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants {
     public static final class DriveConstants {
-        public static final int kLeftMotor1_id = 11;
-        public static final int kLeftMotor2_id = 12;
-        public static final int kRightMotor1_id = 13;
-        public static final int kRightMotor2_id = 14;
+        public static final int kLeftMotor1_id = 36;
+        public static final int kLeftMotor2_id = 38;
+        public static final int kRightMotor1_id = 33;
+        public static final int kRightMotor2_id = 37;
 
         public static final double kDriveGearRatio = 10.71;
 
@@ -73,7 +73,7 @@ public final class Constants {
         public static final double kPDriveVel = 8.5;
     }
     public static final class OIConstants {
-        public static final int kDriverControllerPort = 1;
+        public static final int kDriverControllerPort = 0;
     }
 
     public static final class AutoConstants {
@@ -118,8 +118,8 @@ public final class Constants {
     }
 
     public static final class LauncherConstants {
-        public static final int kLauncherMotorLeft_id = 41;
-        public static final int kLauncherMotorRight_id = 42;
+        public static final int kLauncherMotorLeft_id = 31;
+        public static final int kLauncherMotorRight_id = 39;
         public static final double kClosedLoopRampRate = 0.20;  // 200 milli seconds from 0 to full throttle
         public static final IdleMode kIdleMode = IdleMode.kCoast;
         public static final int kSparkMaxBuiltinCPR = 42;

@@ -26,7 +26,6 @@ public class Launcher extends SubsystemBase {
   public Launcher() {
     m_motorL = new CANSparkMax(LauncherConstants.kLauncherMotorLeft_id, MotorType.kBrushless);
     m_motorR = new CANSparkMax(LauncherConstants.kLauncherMotorRight_id, MotorType.kBrushless);
-    m_motorR.follow(m_motorL, true); // Set the output of right motor to opposite of that of the left motor
 
     m_motorL.restoreFactoryDefaults();
     m_motorR.restoreFactoryDefaults();
@@ -34,6 +33,8 @@ public class Launcher extends SubsystemBase {
     m_motorR.setClosedLoopRampRate(LauncherConstants.kClosedLoopRampRate);
     m_motorL.setIdleMode(LauncherConstants.kIdleMode);
     m_motorR.setIdleMode(LauncherConstants.kIdleMode);
+    m_motorL.follow(m_motorR, true); // Set the output of right motor to opposite of that of the left motor
+    m_motorL.burnFlash();
 
     m_encoderL = new CANEncoder(m_motorL);
     m_encoderR = new CANEncoder(m_motorR);

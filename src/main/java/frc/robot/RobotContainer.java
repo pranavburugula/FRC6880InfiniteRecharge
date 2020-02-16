@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -30,7 +31,8 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.Auto_pos3_path1;
+import frc.robot.commands.DefaultDrive;
+//import frc.robot.commands.Auto_pos3_path1;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Launcher;
@@ -52,9 +54,10 @@ public class RobotContainer {
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-  private final Intake m_intake = new Intake();
-  private final Indexer m_indexer = new Indexer();
-  private final Launcher m_launcher = new Launcher();
+  // private final Intake m_intake = new Intake();
+  // private final Indexer m_indexer = new Indexer();
+  // private final Launcher m_launcher = new Launcher();
+
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -62,6 +65,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+     m_robotDrive.setDefaultCommand(new DefaultDrive(m_robotDrive,
+      () -> m_driverController.getY(GenericHID.Hand.kLeft), 
+      () -> m_driverController.getX(GenericHID.Hand.kRight)));
   }
 
   /**
@@ -96,8 +103,9 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    Auto_pos3_path1 autoCmd_3_1 = new Auto_pos3_path1(m_robotDrive, m_intake, m_indexer, m_launcher);
-    return autoCmd_3_1.getAutoCommand();
-  }
+  //public Command getAutonomousCommand() {
+    // Auto_pos3_path1 autoCmd_3_1 = new Auto_pos3_path1(m_robotDrive, m_intake, m_indexer, m_launcher);
+    // return autoCmd_3_1.getAutoCommand();
+  //  return new Command();
+  //}
 }

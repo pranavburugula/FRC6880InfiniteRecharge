@@ -74,6 +74,7 @@ public final class Constants {
     }
     public static final class OIConstants {
         public static final int kDriverControllerPort = 0;
+        public static final int kOtherControllerPort = 1;
     }
 
     public static final class AutoConstants {
@@ -107,7 +108,7 @@ public final class Constants {
     }
 
     public static final class IndexerConstants {
-        public static final int kIndexerMotor_id = 31;
+        public static final int kIndexerMotor_id = 11;
         public static final InvertType kMotorInverted = InvertType.None;
         public static final int[] kEncoderPorts = new int[]{6, 7};
         public static final boolean kEncoderReversed = false;

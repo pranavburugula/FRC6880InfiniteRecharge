@@ -53,10 +53,11 @@ public class RobotContainer {
   // private final AutoDriveToTrench m_autoCommand = new AutoDriveToTrench(m_robotDrive);
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxController m_othController = new XboxController(OIConstants.kOtherControllerPort);
 
   // private final Intake m_intake = new Intake();
-  // private final Indexer m_indexer = new Indexer();
-  // private final Launcher m_launcher = new Launcher();
+  private final Indexer m_indexer = new Indexer(m_othController);
+  private final Launcher m_launcher = new Launcher(m_othController);
 
 
   /**

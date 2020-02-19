@@ -13,17 +13,22 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LauncherConstants;
 
 public class Launcher extends SubsystemBase {
   private final CANSparkMax m_motorL, m_motorR;
   private final CANEncoder  m_encoderL, m_encoderR;
-  private final CANPIDController m_pidVelocity;
+  /*private final CANPIDController m_pidVelocity;*/
+  private XboxController m_controller2;
   /**
    * Creates a new Launcher.
    */
-  public Launcher() {
+  public Launcher(XboxController controller2) {
+    m_controller2 = controller2;
     m_motorL = new CANSparkMax(LauncherConstants.kLauncherMotorLeft_id, MotorType.kBrushless);
     m_motorR = new CANSparkMax(LauncherConstants.kLauncherMotorRight_id, MotorType.kBrushless);
 
@@ -33,12 +38,12 @@ public class Launcher extends SubsystemBase {
     m_motorR.setClosedLoopRampRate(LauncherConstants.kClosedLoopRampRate);
     m_motorL.setIdleMode(LauncherConstants.kIdleMode);
     m_motorR.setIdleMode(LauncherConstants.kIdleMode);
-    m_motorL.follow(m_motorR, true); // Set the output of right motor to opposite of that of the left motor
-    m_motorL.burnFlash();
+    //m_motorR.follow(m_motorL, true); // Set the output of right motor to opposite of that of the left motor
+    /*m_motorL.burnFlash();*/
 
     m_encoderL = new CANEncoder(m_motorL);
     m_encoderR = new CANEncoder(m_motorR);
-    
+    /*
     // Setup the controller on leader; the follower will get the voltage values from leader.
     m_pidVelocity = new CANPIDController(m_motorL);
 
@@ -49,16 +54,27 @@ public class Launcher extends SubsystemBase {
     m_pidVelocity.setIZone(LauncherConstants.kIz);
     m_pidVelocity.setFF(LauncherConstants.kFF);
     m_pidVelocity.setOutputRange(LauncherConstants.kMinOutput, LauncherConstants.kMaxOutput);
+    */
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    launch(m_controller2.getY(GenericHID.Hand.kLeft));
   }
 
   public void launch(double pctSpeed) {
+    /*
     double setPoint = pctSpeed * LauncherConstants.maxRPM;
     m_pidVelocity.setReference(setPoint, ControlType.kVelocity);
+    */
     // m_motorL.set(LauncherConstants.kLauncherPower);
+    if (Math.abs(pctSpeed) < 0.1) {
+      pctSpeed = 0.0;
+    } else {
+      pctSpeed = Math.signum(pctSpeed) * (pctSpeed * pctSpeed);
+    }
+    m_motorL.set(pctSpeed);
+    m_motorR.set(-pctSpeed);
   }
 }

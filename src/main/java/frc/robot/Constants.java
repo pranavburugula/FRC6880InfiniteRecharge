@@ -38,7 +38,7 @@ public final class Constants {
         //     // Assumes the encoders are NOT directly mounted on the wheel shafts
         //     (kWheelDiameterInches * Math.PI) / (double) (kEncoderCPR * kDriveGearRatio);
 
-        public static final double kTrackwidthMeters = 0.69;
+        public static final double kTrackwidthMeters = 0.1524;
         public static final DifferentialDriveKinematics kDriveKinematics =
             new DifferentialDriveKinematics(kTrackwidthMeters);
 
@@ -65,12 +65,12 @@ public final class Constants {
         // for *your* robot's drive.
         // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
         // values for your robot.
-        public static final double ksVolts = 0.22;
-        public static final double kvVoltSecondsPerMeter = 1.98;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+        public static final double ksVolts = 0.15;
+        public static final double kvVoltSecondsPerMeter = 2.71;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.367;
     
         // Example value only - as above, this must be tuned for your drive!
-        public static final double kPDriveVel = 8.5;
+        public static final double kPDriveVel = 1.34;
     }
     public static final class OIConstants {
         public static final int kDriverControllerPort = 1;
@@ -81,15 +81,15 @@ public final class Constants {
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
         // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-        public static final double kRamseteB = 2;
+        public static final double kRamseteB = 2.0;
         public static final double kRamseteZeta = 0.7;
     }
 
     public static final class AutoPathsConstants {
-        public static final int kPos3Path1_numSegments = 4;
+        public static final int kPos3Path1_numSegments = 3;
         public static final String[] kPos3Path1 = 
-            new String[] {"paths/Auto_pos3_path1_segment1.wpilib.json", "paths/Auto_pos3_path1_segment2.wpilib.json",
-                "paths/Auto_pos3_path1_segment3.wpilib.json", "paths/Auto_pos3_path1_segment4.wpilib.json"};
+            new String[] {"paths/startFromCenter.wpilib.json", "paths/startFromLeft.wpilib.json",
+                "paths/startFromRight.wpilib.json"};
     }
 
     public static final class IntakeConstants {
@@ -127,7 +127,7 @@ public final class Constants {
         // public static final double kLauncherPower = 0.8;
 
         // PID coefficients
-        public static final double  kP = 6e-5; 
+        public static final double  kP = 1.34; 
         public static final double  kI = 0;
         public static final double  kD = 0; 
         public static final double  kIz = 0; 

@@ -30,47 +30,36 @@ public final class Constants {
         public static final int kRightMotor2_id = 37;
 
         public static final double kDriveGearRatio = 10.71;
+        public static final double kWheelDiameterMeters = 0.1524;
+        public static final double kTrackwidthMeters = 0.6713;
 
         public static final int kSparkMaxBuiltinCPR = 42;
-        // public static final int kEncoderCPR = kSparkMaxBuiltinCPR;
-        // public static final double kWheelDiameterInches = 6;
-        // public static final double kEncoderDistancePerPulse =
-        //     // Assumes the encoders are NOT directly mounted on the wheel shafts
-        //     (kWheelDiameterInches * Math.PI) / (double) (kEncoderCPR * kDriveGearRatio);
+        //Convert the Rotations reported by built-in neo encoder to Meters as needed by the 
+        // WPILIB's Ramsette controller
+        public static final double kNeoPositionConversionFactor = (1/kDriveGearRatio) * Math.PI * kWheelDiameterMeters;
+        // Convert RPM reported by built-in neo encoder to Meters/sec as needed by the 
+        // WPILIB's Ramsette controller
+        public static final double kNeoVelocityConversionFactor = (1/60) * (1/kDriveGearRatio) * Math.PI * kWheelDiameterMeters;
 
-        public static final double kTrackwidthMeters = 0.69;
         public static final DifferentialDriveKinematics kDriveKinematics =
             new DifferentialDriveKinematics(kTrackwidthMeters);
 
-        public static final int[] kLeftEncoderPorts = new int[]{0, 1};
-        public static final int[] kRightEncoderPorts = new int[]{2, 3};
-        public static final boolean kLeftEncoderReversed = true;
-        public static final boolean kRightEncoderReversed = false;
-        
-        public static final double kWheelDiameterMeters = 0.1524;
-        public static final double kLeftEncoderPulsesPerRev = 8192; // Rev Throughbore encoder
-        public static final double kRightEncoderPulsesPerRev = 8192; // Rev Throughbore encoder
-        public static final double kLeftMetersPerPulse = Math.PI * kWheelDiameterMeters / kLeftEncoderPulsesPerRev;
-        public static final double kRightMetersPerPulse = Math.PI * kWheelDiameterMeters / kRightEncoderPulsesPerRev;
     
-        public static final int kNeoEncoderPulsesPerRev = kSparkMaxBuiltinCPR * 4;
-        public static final double kNeoEncoderMetersPerPulse =
-            // Assumes the encoders are directly mounted on the wheel shafts
-            (kWheelDiameterMeters * Math.PI) / (double) (kNeoEncoderPulsesPerRev * kDriveGearRatio);
+        // public static final int kNeoEncoderPulsesPerRev = kSparkMaxBuiltinCPR * 4;
+        // public static final double kNeoEncoderMetersPerPulse =
+        //     // Assumes the encoders are directly mounted on the wheel shafts
+        //     (kWheelDiameterMeters * Math.PI) / (double) (kNeoEncoderPulsesPerRev * kDriveGearRatio);
     
         public static final boolean kGyroReversed = true;
     
-        // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-        // These characterization values MUST be determined either experimentally or theoretically
-        // for *your* robot's drive.
-        // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
-        // values for your robot.
-        public static final double ksVolts = 0.22;
-        public static final double kvVoltSecondsPerMeter = 1.98;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+        // kS, kV, kA values from frc-characterization tool
+        public static final double ksVolts = 0.15;
+        public static final double kvVoltSecondsPerMeter = 2.71;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.367;
     
         // Example value only - as above, this must be tuned for your drive!
-        public static final double kPDriveVel = 8.5;
+        public static final double kPDriveVel = 1.34; // value from characterization tool is 13.4!
+        public static final double kD = 0.0;
     }
     public static final class OIConstants {
         public static final int kDriverControllerPort = 0;
@@ -121,20 +110,27 @@ public final class Constants {
     public static final class LauncherConstants {
         public static final int kLauncherMotorLeft_id = 31;
         public static final int kLauncherMotorRight_id = 39;
-        public static final double kClosedLoopRampRate = 0.20;  // 200 milli seconds from 0 to full throttle
+        public static final double kClosedLoopRampRate = 1.0;  // 1 second from 0 to full throttle
         public static final IdleMode kIdleMode = IdleMode.kCoast;
-        public static final int kSparkMaxBuiltinCPR = 42;
-        public static final int kNeoEncoderPulsesPerRev = kSparkMaxBuiltinCPR * 4;
         // public static final double kLauncherPower = 0.8;
 
-        // PID coefficients
-        public static final double  kP = 6e-5; 
+        // Values from FRC Characterization Tool (Spark Max controller; units: Rotations per second)
+        public static final double kS = 0.0609;
+        public static final double kV = 0.126;
+        public static final double kA = 0.0177;
+        public static final double char_kP_RPS = 0.14; // kP in units of Revolutions per second; output is voltage
+        public static final double char_kD = 0.0;
+        public static final double kMaxVoltage = 12.0;
+        public static final double kP_RPM = char_kP_RPS / (kMaxVoltage * 60);
+
+        // PID coefficients, tryied to manually tune them without characterization tool
+        // public static final double  kP = 6e-5; 
         public static final double  kI = 0;
         public static final double  kD = 0; 
         public static final double  kIz = 0; 
-        public static final double  kFF = 0.000015; 
+        // public static final double  kFF = 0.00015; // zero-zero-zero-one-five
         public static final double  kMaxOutput = 1; 
         public static final double  kMinOutput = -1;
-        public static final double  maxRPM = 5700;
+        public static final double  kMaxRPM = 5700;
     }
 }

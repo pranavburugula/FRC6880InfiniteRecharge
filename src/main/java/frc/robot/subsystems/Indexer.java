@@ -12,52 +12,38 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexerConstants;
 
 public class Indexer extends SubsystemBase {
   private final VictorSPX m_motor;
-  //private final Encoder  m_Encoder;
-  private XboxController m_contorller;
+  private final Encoder  m_Encoder;
   /**
    * Creates a new Indexer.
    */
-  public Indexer(XboxController controller) {
-    m_contorller = controller;
+  public Indexer() {
     m_motor = new VictorSPX(IndexerConstants.kIndexerMotor_id);
     m_motor.configFactoryDefault();
     m_motor.setNeutralMode(NeutralMode.Brake);
     m_motor.setInverted(IndexerConstants.kMotorInverted);
 
-    /* m_Encoder = new Encoder(IndexerConstants.kEncoderPorts[0], IndexerConstants.kEncoderPorts[1]);
+    m_Encoder = new Encoder(IndexerConstants.kEncoderPorts[0], IndexerConstants.kEncoderPorts[1]);
     m_Encoder.setReverseDirection(IndexerConstants.kEncoderReversed);
     resetEncoder();
 
     addChild("Indexer Encoder", m_Encoder);
-    */
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    double speed = m_contorller.getY(GenericHID.Hand.kRight);
-    m_motor.set(ControlMode.PercentOutput, speed);
-    /*
-    if (m_contorller.getAButtonPressed()) {
-      pullInPowerCells();
-    } else {
-      m_motor.set(ControlMode.PercentOutput, 0.0);
-    }
-    */
   }
 
   /**
    * Resets the drive encoders to currently read a position of 0.
    */
   public void resetEncoder() {
-    // m_Encoder.reset();
+    m_Encoder.reset();
   }
 
   public void pullInPowerCells() {
@@ -70,5 +56,9 @@ public class Indexer extends SubsystemBase {
     // ToDo:  Need to add Velocity closed loop controller based on 
     // either the frc-characterization output or CANifier-connected throughbore encoder.
     m_motor.set(ControlMode.PercentOutput, IndexerConstants.kPushOutPower);
+  }
+
+  public void activate(double pctSpeed) {
+    m_motor.set(ControlMode.PercentOutput, pctSpeed);
   }
 }

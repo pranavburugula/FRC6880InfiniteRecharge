@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -16,54 +17,71 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 
 public class DriveTrain extends SubsystemBase {
   CANSparkMax m_leftMaster, m_leftSlave, m_rightMaster, m_rightSlave;
   CANEncoder  neo_leftEncoder, neo_rightEncoder;
-  // private final Encoder m_leftEncoder;
-  // private final Encoder m_rightEncoder;
 
+  // Odometry class for tracking robot pose
+  private final DifferentialDriveOdometry m_odometry;
 
-  Supplier<Double> leftEncoderPosition;
-  Supplier<Double> leftEncoderRate;
-  Supplier<Double> rightEncoderPosition;
-  Supplier<Double> rightEncoderRate;
   Supplier<Double> gyroAngleRadians;
   DifferentialDrive m_dDrive;
+  AHRS m_navx;
 
   /**
    * Creates a new DriveTrain.
    */
   public DriveTrain() {
     m_leftMaster = new CANSparkMax(DriveConstants.kLeftMotor1_id, MotorType.kBrushless);
+    m_leftMaster.restoreFactoryDefaults();
     m_leftMaster.setInverted(false);
-    m_leftMaster.setIdleMode(IdleMode.kBrake);
+    m_leftMaster.setIdleMode(IdleMode.kCoast);
     neo_leftEncoder = m_leftMaster.getEncoder();
+    neo_leftEncoder.setPositionConversionFactor(DriveConstants.kNeoPositionConversionFactor);
+    neo_leftEncoder.setVelocityConversionFactor(DriveConstants.kNeoVelocityConversionFactor);
 
     m_leftSlave = new CANSparkMax(DriveConstants.kLeftMotor2_id, MotorType.kBrushless);
-    m_leftSlave.setIdleMode(IdleMode.kBrake);
+    m_leftSlave.restoreFactoryDefaults();
+    m_leftSlave.setIdleMode(IdleMode.kCoast);
     m_leftSlave.follow(m_leftMaster);
 
     m_rightMaster = new CANSparkMax(DriveConstants.kRightMotor1_id, MotorType.kBrushless);
+    m_rightMaster.restoreFactoryDefaults();
     m_rightMaster.setInverted(false);
-    m_rightMaster.setIdleMode(IdleMode.kBrake);
+    m_rightMaster.setIdleMode(IdleMode.kCoast);
     neo_rightEncoder = m_rightMaster.getEncoder();
+    neo_rightEncoder.setPositionConversionFactor(DriveConstants.kNeoPositionConversionFactor);
+    neo_rightEncoder.setVelocityConversionFactor(DriveConstants.kNeoVelocityConversionFactor);
 
     m_rightSlave = new CANSparkMax(DriveConstants.kRightMotor2_id, MotorType.kBrushless);
-    m_rightSlave.setIdleMode(IdleMode.kBrake);
+    m_rightSlave.restoreFactoryDefaults();
+    m_rightSlave.setIdleMode(IdleMode.kCoast);
     m_rightSlave.follow(m_rightMaster);
 
     m_dDrive = new DifferentialDrive(m_leftMaster, m_rightMaster);
     m_dDrive.setDeadband(0);
 
     resetEncoders();
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+
+    //
+    // Configure gyro
+    //
+    // Note that the angle from the NavX and all implementors of wpilib Gyro
+    // must be negated because getAngle returns a clockwise positive angle
+    m_navx = new AHRS(SPI.Port.kMXP);
+    gyroAngleRadians = () -> -1 * Math.toRadians(m_navx.getAngle());
 
 
     // Let's name the sensors on the LiveWindow
-    addChild("Drive", m_dDrive);
+    // addChild("Drive", m_dDrive);
 
   }
 
@@ -71,8 +89,36 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Update the odometry in the periodic block
-    //m_odometry.update(Rotation2d.fromDegrees(getHeading()), m_leftEncoder.getDistance(),
-    //                  m_rightEncoder.getDistance());
+    // Note that the setPositionConversionFactor() has been applied to the left and right encoders in the constructor.
+    m_odometry.update(Rotation2d.fromDegrees(getHeading()), neo_leftEncoder.getPosition(), neo_rightEncoder.getPosition());
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
+  /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(neo_leftEncoder.getVelocity(), neo_rightEncoder.getVelocity());
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 
   /**
@@ -106,7 +152,6 @@ public class DriveTrain extends SubsystemBase {
    */
   public double getAverageEncoderDistance() {
     return (neo_leftEncoder.getPosition() + neo_rightEncoder.getPosition()) / 2.0;
-    // return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
   }
 
   /**
@@ -116,7 +161,6 @@ public class DriveTrain extends SubsystemBase {
    */
   public CANEncoder getLeftEncoder() {
     return neo_leftEncoder;
-    //    return m_leftEncoder;
   }
 
   /**
@@ -126,7 +170,6 @@ public class DriveTrain extends SubsystemBase {
    */
   public CANEncoder getRightEncoder() {
     return neo_rightEncoder;
-    // return m_rightEncoder;
   }
 
   /**
@@ -138,8 +181,6 @@ public class DriveTrain extends SubsystemBase {
     m_dDrive.setMaxOutput(maxOutput);
   }
 
-
-
   /**
    * Resets the drive encoders to currently read a position of 0.
    */
@@ -150,5 +191,20 @@ public class DriveTrain extends SubsystemBase {
     // m_rightEncoder.reset();
   }
 
+  /**
+   * Zeroes the heading of the robot.
+   */
+  public void zeroHeading() {
+    m_navx.reset();
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from 180 to 180
+   */
+  public double getHeading() {
+    return Math.IEEEremainder(m_navx.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
 
 }

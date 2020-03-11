@@ -80,16 +80,21 @@ public class Limelight extends SubsystemBase {
   }
 
   /**
-   * Calculates amount of proportional correction to apply to robot
-   * @param targetDist
-   * @param targetAngle
-   * @return
+   * Calculates amount of proportional correction to apply to robot to reach a distance offset from the target
+   * @param targetDist Distance from target to move robot to
+   * @return Correction to apply to drivebase to reach distance
    */
   public double calculateDistanceCorrection(double targetDist) {
     double deltaDist = calculateDistanceToTarget() - targetDist;
     return kP_distance * deltaDist;
   }
 
+  /**
+   * Calculates proportional correction to reach a certain distance and orientation with respect to the target
+   * @param targetDist Distance from target to move robot to
+   * @param targetAngle Angle between robot and target to end at
+   * @return Correction to apply to drivebase
+   */
   public double calculateSeekTargetCorrection(double targetDist, double targetAngle) {
     return calculateAimingCorrection(targetAngle) + calculateDistanceCorrection(targetDist);
   }

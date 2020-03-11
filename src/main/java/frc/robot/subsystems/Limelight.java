@@ -27,14 +27,30 @@ public class Limelight extends SubsystemBase {
   private NetworkTableEntry ty_getter = sf_tab.add("ty Value", 0.0).getEntry();
   private NetworkTableEntry ta_getter = sf_tab.add("ta Value", 0.0).getEntry();
 
-  private double kP, initSpeed, buffer;
+  private double kP_orientation, kP_distance;
+  private double initSpeed;
+  private double mountingAngle, mountingHeight;
+  private double targetHeight;
 
   /**
    * Creates a new Limelight.
    */
   public Limelight() {
-    kP = 0.1;
-    initSpeed = 0.05;    // Min speed required to move drivetrain
+    kP_orientation = 0.1;
+    kP_distance = 0.1;
+    initSpeed = 0.05;
+    mountingAngle = 0.0;
+    mountingHeight = 0.0;
+    targetHeight = 1.0;
+  }
+
+  public Limelight(double kP_orient, double kP_dist, double speed, double mountA, double mountH, double targetH) {
+    kP_orientation = kP_orient;
+    kP_distance = kP_dist;
+    initSpeed = speed;    // Min speed required to move drivetrain
+    mountingAngle = mountA;
+    mountingHeight = mountH;
+    targetHeight = targetH;
   }
 
   public void displayLimelightValues() {
@@ -48,25 +64,43 @@ public class Limelight extends SubsystemBase {
    * 
    * tan(vertical angle offset + mounting angle) = (targetHeight - mountingHeight) / distance
    * 
-   * @param mountingHeight Height of Limelight from ground
-   * @param mountingAngle Angle of Limelight with respect to ground
-   * @param targetHeight Height of target from ground
+   * @param mountH Height of Limelight from ground
+   * @param mountA Angle of Limelight with respect to ground
+   * @param targetH Height of target from ground
    * @return Radial distance to target
    */
-  public double calculateDistanceToTarget(double mountingHeight, double mountingAngle, double targetHeight) {
+  public double calculateDistanceToTarget(double mountH, double mountA, double targetH) {
     double phi = ty.getDouble(0.0);
-    double distance = (targetHeight - mountingHeight) / (Math.tan(phi + mountingAngle));
+    double distance = (targetH - mountH) / (Math.tan(phi + mountA));
 
     return distance;
   }
+  public double calculateDistanceToTarget() {
+    return calculateDistanceToTarget(mountingHeight, mountingAngle, targetHeight);
+  }
 
+  public double calculateDistanceCorrection(double targetDist, double targetAngle) {
+    double deltaDist = calculateDistanceToTarget() - targetDist;
+    double aimAdjust = calculateAimingCorrection(targetAngle);
+    return aimAdjust + kP_distance * deltaDist;
+  }
+
+  /**
+   * Calculates correction to apply to robot to aim towards a target
+   * @param targetOffset Desired angle (degrees) between robot and target
+   * @return
+   */
   public double calculateAimingCorrection(double targetOffset) {
     double theta = tx.getDouble(0.0);
     double correction = 0.0;
-    if (theta > targetOffset) {
-      correction = kP * theta - initSpeed;    // Robot oriented too far right, spin left
-    } else if (theta < targetOffset) {
-      correction = kP * theta + initSpeed;    // Robot oriented too far left, spin right
+    if (tv.getDouble(0.0) > 0.0) {
+      if (theta > targetOffset) {
+        correction = kP_orientation * theta - initSpeed;    // Robot oriented too far right, spin left
+      } else if (theta < targetOffset) {
+        correction = kP_orientation * theta + initSpeed;    // Robot oriented too far left, spin right
+      }
+    } else {
+      System.out.println("frc6880: Limelight: No targets visible");
     }
 
     return correction;
@@ -85,5 +119,6 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     //read values periodically
+    displayLimelightValues();
   }
 }

@@ -44,10 +44,20 @@ public class Limelight extends SubsystemBase {
   }
 
   /**
-   * ToDo: 
+   * Calculates radial distance to vision target using the following formula:
+   * 
+   * tan(vertical angle offset + mounting angle) = (targetHeight - mountingHeight) / distance
+   * 
+   * @param mountingHeight Height of Limelight from ground
+   * @param mountingAngle Angle of Limelight with respect to ground
+   * @param targetHeight Height of target from ground
+   * @return Radial distance to target
    */
-  public void calculateDistanceToPowerport() {
+  public double calculateDistanceToTarget(double mountingHeight, double mountingAngle, double targetHeight) {
+    double phi = ty.getDouble(0.0);
+    double distance = (targetHeight - mountingHeight) / (Math.tan(phi + mountingAngle));
 
+    return distance;
   }
 
   public double calculateAimingCorrection(double targetOffset) {

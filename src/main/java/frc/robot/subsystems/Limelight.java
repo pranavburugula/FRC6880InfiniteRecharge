@@ -27,11 +27,14 @@ public class Limelight extends SubsystemBase {
   private NetworkTableEntry ty_getter = sf_tab.add("ty Value", 0.0).getEntry();
   private NetworkTableEntry ta_getter = sf_tab.add("ta Value", 0.0).getEntry();
 
+  private double kP, initSpeed, buffer;
+
   /**
    * Creates a new Limelight.
    */
   public Limelight() {
-
+    kP = 0.1;
+    initSpeed = 0.05;    // Min speed required to move drivetrain
   }
 
   public void displayLimelightValues() {
@@ -45,6 +48,18 @@ public class Limelight extends SubsystemBase {
    */
   public void calculateDistanceToPowerport() {
 
+  }
+
+  public double calculateAimingCorrection(double targetOffset) {
+    double theta = tx.getDouble(0.0);
+    double correction = 0.0;
+    if (theta > targetOffset) {
+      correction = kP * theta - initSpeed;    // Robot oriented too far right, spin left
+    } else if (theta < targetOffset) {
+      correction = kP * theta + initSpeed;    // Robot oriented too far left, spin right
+    }
+
+    return correction;
   }
 
   /**

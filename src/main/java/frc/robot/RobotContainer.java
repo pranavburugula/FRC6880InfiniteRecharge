@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.XboxController.Axis;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.OIConstants;
 //import frc.robot.commands.Auto_pos3_path1;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Launcher;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -39,6 +41,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Indexer m_indexer = new Indexer();
   private final Launcher m_launcher = new Launcher();
+  private final Limelight m_limelight = new Limelight();
 
   // private final AutoDriveToTrench m_autoCommand = new AutoDriveToTrench(m_robotDrive);
   // The driver's controller
@@ -64,8 +67,9 @@ public class RobotContainer {
       new RunCommand(() -> m_launcher
         .launch(m_gamepad2.getY(GenericHID.Hand.kLeft)), m_launcher));
     
-    // ToDo: Add more button / trigger / gamepad-stick bindings
-  
+    // ToDo: Add more trigger / gamepad-stick bindings
+
+    
     // ToDo:  Add CameraServer to display the front side camera (not Limelight!) video stream.
 
   }
@@ -81,6 +85,15 @@ public class RobotContainer {
     new JoystickButton(m_gamepad1, Button.kBumperRight.value)
         .whenPressed(() -> m_robotDrive.setMaxOutput(0.5))
         .whenReleased(() -> m_robotDrive.setMaxOutput(1));
+
+    // Bind Limelight-based shooter aiming to Gamepad 1 button a
+    new JoystickButton(m_gamepad1, XboxController.Button.kA.value)
+        .whileHeld(() -> m_robotDrive.arcadeDrive(0.0, m_limelight.calculateAimingCorrection(0.0)));
+
+    // Bind Limelight-based seek target to Gamepad 1 button y
+    new JoystickButton(m_gamepad1, XboxController.Button.kY.value)
+        .whileHeld(() -> m_robotDrive.arcadeDrive(m_limelight.calculateDistanceCorrection(LimelightConstants.seekTargetDistance), 
+                                                  m_limelight.calculateAimingCorrection(0.0)));
     
     // Add another binding to toggle coast and brake modes for the drive train
   }

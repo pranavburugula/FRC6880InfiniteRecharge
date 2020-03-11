@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LimelightConstants;
 
 public class Limelight extends SubsystemBase {
 
@@ -36,21 +37,12 @@ public class Limelight extends SubsystemBase {
    * Creates a new Limelight.
    */
   public Limelight() {
-    kP_orientation = 0.1;
-    kP_distance = 0.1;
-    initSpeed = 0.05;
-    mountingAngle = 0.0;
-    mountingHeight = 0.0;
-    targetHeight = 1.0;
-  }
-
-  public Limelight(double kP_orient, double kP_dist, double speed, double mountA, double mountH, double targetH) {
-    kP_orientation = kP_orient;
-    kP_distance = kP_dist;
-    initSpeed = speed;    // Min speed required to move drivetrain
-    mountingAngle = mountA;
-    mountingHeight = mountH;
-    targetHeight = targetH;
+    kP_orientation = LimelightConstants.kP_orientation;
+    kP_distance = LimelightConstants.kP_distance;
+    initSpeed = LimelightConstants.initSpeed;
+    mountingAngle = LimelightConstants.mountingAngle;
+    mountingHeight = LimelightConstants.mountingHeight;
+    targetHeight = LimelightConstants.targetHeight;
   }
 
   public void displayLimelightValues() {
@@ -71,12 +63,12 @@ public class Limelight extends SubsystemBase {
    */
   public double calculateDistanceToTarget(double mountH, double mountA, double targetH) {
     double phi = ty.getDouble(0.0);
-    double distance = (targetH - mountH) / (Math.tan(phi + mountA));
+    double distance = (targetH - mountH) / (Math.tan(phi + mountA));    // Uses trig formula in javadoc, solved for distance
 
     return distance;
   }
   public double calculateDistanceToTarget() {
-    return calculateDistanceToTarget(mountingHeight, mountingAngle, targetHeight);
+    return calculateDistanceToTarget(mountingHeight, mountingAngle, targetHeight);  // Default method uses configured LimelightConstants
   }
 
   /**
@@ -85,29 +77,19 @@ public class Limelight extends SubsystemBase {
    * @return Correction to apply to drivebase to reach distance
    */
   public double calculateDistanceCorrection(double targetDist) {
-    double deltaDist = calculateDistanceToTarget() - targetDist;
+    double deltaDist = calculateDistanceToTarget() - targetDist;    // Distance error from target distance
     return kP_distance * deltaDist;
-  }
-
-  /**
-   * Calculates proportional correction to reach a certain distance and orientation with respect to the target
-   * @param targetDist Distance from target to move robot to
-   * @param targetAngle Angle between robot and target to end at
-   * @return Correction to apply to drivebase
-   */
-  public double calculateSeekTargetCorrection(double targetDist, double targetAngle) {
-    return calculateAimingCorrection(targetAngle) + calculateDistanceCorrection(targetDist);
   }
 
   /**
    * Calculates correction to apply to robot to aim towards a target
    * @param targetOffset Desired angle (degrees) between robot and target
-   * @return
+   * @return Rotation correction to align with target
    */
   public double calculateAimingCorrection(double targetOffset) {
     double theta = tx.getDouble(0.0);
     double correction = 0.0;
-    if (tv.getDouble(0.0) > 0.0) {
+    if (tv.getDouble(0.0) > 0.0) {    // Check if any targets are detected (tv > 0)
       if (theta > targetOffset) {
         correction = kP_orientation * theta - initSpeed;    // Robot oriented too far right, spin left
       } else if (theta < targetOffset) {

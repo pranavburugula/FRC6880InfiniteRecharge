@@ -133,4 +133,15 @@ public final class Constants {
         public static final double  kMinOutput = -1;
         public static final double  kMaxRPM = 5700;
     }
+
+    public static final class LimelightConstants {
+        public static final double kP_orientation = 0.1;
+        public static final double kP_distance = 0.1;
+        public static final double initSpeed = 0.05;
+        public static final double mountingAngle = 0.0;     // Measured in degrees
+        public static final double mountingHeight = 0.0;    // Measured in feet
+        public static final double targetHeight = 1.0;      // Measured in feet
+
+        public static final double seekTargetDistance = 11.0;       // Measured in feet
+    }
 }

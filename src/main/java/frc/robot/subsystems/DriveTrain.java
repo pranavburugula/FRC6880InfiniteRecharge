@@ -133,6 +133,10 @@ public class DriveTrain extends SubsystemBase {
 
   public void arcadeDrive() {}
 
+  public void tankDrive(double left, double right) {
+    m_dDrive.tankDrive(left, right);
+  }
+
   /**
    * Controls the left and right sides of the drive directly with voltages.
    *

@@ -24,10 +24,13 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Launcher;
 import frc.robot.subsystems.Limelight;
+import frc.robot.subsystems.VictorSP_NavX_DriveTrain;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -37,10 +40,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain m_robotDrive = new DriveTrain();
-  private final Intake m_intake = new Intake();
-  private final Indexer m_indexer = new Indexer();
-  private final Launcher m_launcher = new Launcher();
+  private final VictorSP_NavX_DriveTrain m_robotDrive = new VictorSP_NavX_DriveTrain("");
+  // private final Intake m_intake = new Intake();
+  // private final Indexer m_indexer = new Indexer();
+  // private final Launcher m_launcher = new Launcher();
   private final Limelight m_limelight = new Limelight();
 
   // private final AutoDriveToTrench m_autoCommand = new AutoDriveToTrench(m_robotDrive);
@@ -63,11 +66,14 @@ public class RobotContainer {
         m_gamepad1.getX(GenericHID.Hand.kRight)), m_robotDrive));
 
     // ToDo: Need to change the button binding for launcher
-    m_launcher.setDefaultCommand(
-      new RunCommand(() -> m_launcher
-        .launch(m_gamepad2.getY(GenericHID.Hand.kLeft)), m_launcher));
+    // m_launcher.setDefaultCommand(
+    //   new RunCommand(() -> m_launcher
+    //     .launch(m_gamepad2.getY(GenericHID.Hand.kLeft)), m_launcher));
     
     // ToDo: Add more trigger / gamepad-stick bindings
+
+    // new InstantCommand(() -> m_robotDrive
+    //     .arcadeDrive(m_gamepad1.getY(GenericHID.Hand.kLeft), m_gamepad1.getX(GenericHID.Hand.kRight)), m_robotDrive);
 
     
     // ToDo:  Add CameraServer to display the front side camera (not Limelight!) video stream.
@@ -88,12 +94,15 @@ public class RobotContainer {
 
     // Bind Limelight-based shooter aiming to Gamepad 1 button a
     new JoystickButton(m_gamepad1, XboxController.Button.kA.value)
-        .whileHeld(() -> m_robotDrive.arcadeDrive(0.0, m_limelight.calculateAimingCorrection(0.0)));
+        .whileHeld(new RunCommand(() -> m_robotDrive.arcadeDrive(0.0, m_limelight.calculateAimingCorrection(1.0))));
 
     // Bind Limelight-based seek target to Gamepad 1 button y
     new JoystickButton(m_gamepad1, XboxController.Button.kY.value)
-        .whileHeld(() -> m_robotDrive.arcadeDrive(m_limelight.calculateDistanceCorrection(LimelightConstants.seekTargetDistance), 
-                                                  m_limelight.calculateAimingCorrection(0.0)));
+        .whileHeld(new RunCommand(() -> m_robotDrive.arcadeDrive(m_limelight.calculateDistanceCorrection(LimelightConstants.seekTargetDistance), 
+                                                  m_limelight.calculateAimingCorrection(1.0))));
+
+    // new Trigger(() -> m_gamepad1.getY(GenericHID.Hand.kLeft) != 0.0 || m_gamepad1.getX(GenericHID.Hand.kRight) != 0.0)
+    //     .whenActive(() -> m_robotDrive.arcadeDrive(m_gamepad1.getY(GenericHID.Hand.kLeft), m_gamepad1.getX(GenericHID.Hand.kRight)));
     
     // Add another binding to toggle coast and brake modes for the drive train
   }

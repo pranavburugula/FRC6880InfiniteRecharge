@@ -23,6 +23,43 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public static final class VictorSPDriveConstants {
+        public static final int kLeftMotor1Port = 2;
+        public static final int kLeftMotor2Port = 3;
+        public static final int kRightMotor1Port = 0;
+        public static final int kRightMotor2Port = 1;
+
+        public static final double kDriveGearRatio = 10.71;
+
+        public static final double kTrackwidthMeters = 0.5946;
+        public static final DifferentialDriveKinematics kDriveKinematics =
+            new DifferentialDriveKinematics(kTrackwidthMeters);
+
+        public static final int[] kLeftEncoderPorts = new int[]{0, 1};
+        public static final int[] kRightEncoderPorts = new int[]{2, 3};
+        public static final boolean kLeftEncoderReversed = true;
+        public static final boolean kRightEncoderReversed = false;
+        
+        public static final double kWheelDiameterMeters = 0.1524;
+        public static final double kLeftEncoderPulsesPerRev = 1440; // E4T miniature encoder
+        public static final double kRightEncoderPulsesPerRev = 8192; // Rev Throughbore encoder
+        public static final double kLeftMetersPerPulse = Math.PI * kWheelDiameterMeters / kLeftEncoderPulsesPerRev;
+        public static final double kRightMetersPerPulse = Math.PI * kWheelDiameterMeters / kRightEncoderPulsesPerRev;
+        // public static final double kEncoderDistancePerPulse =
+        //     // Assumes the encoders are NOT directly mounted on the wheel shafts
+        //     (kWheelDiameterInches * Math.PI) / (double) (kEncoderCPR * kDriveGearRatio);
+
+        public static final boolean kGyroReversed = true; // For NavX
+    
+        // kS, kV, kA values from frc-characterization tool
+        public static final double ksVolts = 0.49;
+        public static final double kvVoltSecondsPerMeter = 3.08;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.0701;
+    
+        // Example value only - as above, this must be tuned for your drive!
+        public static final double kPDriveVel = 2.14; // May have to be changed to one-tenth of 2.14
+    }
+
     public static final class DriveConstants {
         public static final int kLeftMotor1_id = 36;
         public static final int kLeftMotor2_id = 38;
@@ -139,9 +176,9 @@ public final class Constants {
         public static final double kP_distance = 0.1;
         public static final double initSpeed = 0.05;
         public static final double mountingAngle = 0.0;     // Measured in degrees
-        public static final double mountingHeight = 0.0;    // Measured in feet
-        public static final double targetHeight = 1.0;      // Measured in feet
+        public static final double mountingHeight = 0.58;    // Measured in feet
+        public static final double targetHeight = 2.21;      // Measured in feet
 
-        public static final double seekTargetDistance = 11.0;       // Measured in feet
+        public static final double seekTargetDistance = 5.0;       // Measured in feet
     }
 }

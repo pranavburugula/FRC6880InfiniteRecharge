@@ -27,6 +27,7 @@ public class Limelight extends SubsystemBase {
   private NetworkTableEntry tx_getter = sf_tab.add("tx Value", 0.0).getEntry();
   private NetworkTableEntry ty_getter = sf_tab.add("ty Value", 0.0).getEntry();
   private NetworkTableEntry ta_getter = sf_tab.add("ta Value", 0.0).getEntry();
+  private NetworkTableEntry dist = sf_tab.add("dist", 0.0).getEntry();
 
   private double kP_orientation, kP_distance;
   private double initSpeed;
@@ -49,6 +50,7 @@ public class Limelight extends SubsystemBase {
     tx_getter.setDouble(tx.getDouble(0.0));
     ty_getter.setDouble(ty.getDouble(0.0));
     ta_getter.setDouble(ta.getDouble(0.0));
+    dist.setDouble(calculateDistanceToTarget());
   }
 
   /**
@@ -78,7 +80,8 @@ public class Limelight extends SubsystemBase {
    */
   public double calculateDistanceCorrection(double targetDist) {
     double deltaDist = calculateDistanceToTarget() - targetDist;    // Distance error from target distance
-    return kP_distance * deltaDist;
+    double correction = kP_distance * deltaDist;
+    return (correction >= 0) ? Math.min(0.5, correction) : Math.max(-0.5, correction);
   }
 
   /**
@@ -91,15 +94,15 @@ public class Limelight extends SubsystemBase {
     double correction = 0.0;
     if (tv.getDouble(0.0) > 0.0) {    // Check if any targets are detected (tv > 0)
       if (theta > targetOffset) {
-        correction = kP_orientation * theta - initSpeed;    // Robot oriented too far right, spin left
+        correction = kP_orientation * theta + initSpeed;    // Robot oriented too far right, spin left
       } else if (theta < targetOffset) {
-        correction = kP_orientation * theta + initSpeed;    // Robot oriented too far left, spin right
+        correction = kP_orientation * theta - initSpeed;    // Robot oriented too far left, spin right
       }
     } else {
       System.out.println("frc6880: Limelight: No targets visible");
     }
 
-    return correction;
+    return (correction >= 0) ? Math.min(0.5, correction) : Math.max(-0.5, correction);
   }
 
   /**
